@@ -56,8 +56,6 @@ const Login = () => {
                     username,
                 });
 
-                alert('Login successful');
-
                 // Redirect based on the role
                 if (role === 'donor') {
                     window.location.href = '/donor';

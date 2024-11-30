@@ -14,21 +14,19 @@ const MainPageClient = () => {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
-    // Retrieve user details from sessionStorage
     const user = {
         username: sessionStorage.getItem('username'),
         role: sessionStorage.getItem('role'),
+        latitude: parseFloat(sessionStorage.getItem('latitude')),
+        longitude: parseFloat(sessionStorage.getItem('longitude')),
     };
 
     useEffect(() => {
-        // Check if the user is logged in and has the 'client' role
         if (!user.username || user.role !== 'client') {
             alert('Unauthorized access! Redirecting to login page.');
-            navigate('/login'); // Redirect to login page if not authorized
+            navigate('/login');
             return;
         }
-
-        console.log('User verified as client:', user.username);
 
         fetchDonations();
 
@@ -66,7 +64,8 @@ const MainPageClient = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                setAvailableDonations(data);
+                const filteredDonations = filterDonationsWithin10km(data);
+                setAvailableDonations(filteredDonations);
             } else {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to fetch available donations.');
@@ -95,6 +94,29 @@ const MainPageClient = () => {
         }
     };
 
+    const filterDonationsWithin10km = (donations) => {
+        return donations.filter((donation) => {
+            if (!donation.coordinates) return false;
+            const {latitude, longitude} = donation.coordinates;
+            return isWithin10km(user.latitude, user.longitude, latitude, longitude);
+        });
+    };
+
+    const isWithin10km = (lat1, lon1, lat2, lon2) => {
+        const toRadians = (deg) => deg * (Math.PI / 180);
+        const R = 6371; // Radius of Earth in km
+
+        const dLat = toRadians(lat2 - lat1);
+        const dLon = toRadians(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        const distance = R * c; // Distance in km
+        return distance <= 10;
+    };
+
     const handleClaimDonation = async (donationId) => {
         setError('');
         setSuccessMessage('');
@@ -109,7 +131,6 @@ const MainPageClient = () => {
 
             if (response.ok) {
                 setSuccessMessage('Donation claimed successfully!');
-                socket.emit('foodItemClaimed', {foodItemId: donationId});
                 fetchDonations();
             } else {
                 const errorData = await response.json();
@@ -140,6 +161,11 @@ const MainPageClient = () => {
                             <th>#</th>
                             <th>Food Item</th>
                             <th>Donor</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Veg/Non-Veg</th>
+                            <th>Packed</th>
+                            <th>Shelf Life (hrs)</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
@@ -147,8 +173,8 @@ const MainPageClient = () => {
                         <tbody>
                         {availableDonations.length === 0 ? (
                             <tr>
-                                <td colSpan="5" className="text-center">
-                                    No donations available at the moment.
+                                <td colSpan="10" className="text-center">
+                                    No donations available within your 10km radius.
                                 </td>
                             </tr>
                         ) : (
@@ -157,6 +183,11 @@ const MainPageClient = () => {
                                     <td>{index + 1}</td>
                                     <td>{donation.foodItem}</td>
                                     <td>{donation.donor.username}</td>
+                                    <td>{donation.description || 'N/A'}</td>
+                                    <td>{donation.quantity}</td>
+                                    <td>{donation.vegStatus}</td>
+                                    <td>{donation.packed ? 'Yes' : 'No'}</td>
+                                    <td>{donation.shelfLife}</td>
                                     <td>
                                             <span className={`status ${donation.status.toLowerCase()}`}>
                                                 {donation.status}
@@ -187,13 +218,18 @@ const MainPageClient = () => {
                             <th>#</th>
                             <th>Food Item</th>
                             <th>Donor</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Veg/Non-Veg</th>
+                            <th>Packed</th>
+                            <th>Shelf Life (hrs)</th>
                             <th>Status</th>
                         </tr>
                         </thead>
                         <tbody>
                         {claimedDonations.length === 0 ? (
                             <tr>
-                                <td colSpan="4" className="text-center">
+                                <td colSpan="9" className="text-center">
                                     No claimed donations yet.
                                 </td>
                             </tr>
@@ -203,6 +239,11 @@ const MainPageClient = () => {
                                     <td>{index + 1}</td>
                                     <td>{donation.foodItem}</td>
                                     <td>{donation.donor.username}</td>
+                                    <td>{donation.description || 'N/A'}</td>
+                                    <td>{donation.quantity}</td>
+                                    <td>{donation.vegStatus}</td>
+                                    <td>{donation.packed ? 'Yes' : 'No'}</td>
+                                    <td>{donation.shelfLife}</td>
                                     <td>
                                             <span className={`status ${donation.status.toLowerCase()}`}>
                                                 {donation.status}

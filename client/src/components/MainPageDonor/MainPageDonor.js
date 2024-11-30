@@ -3,9 +3,9 @@ import {useNavigate} from 'react-router-dom';
 import {io} from 'socket.io-client';
 import Navbar from '../Navbar/Navbar';
 import './MainPageDonor.css';
-import {Modal, Button, Form, Card, Col, Row} from 'react-bootstrap';
+import {Modal, Button, Form, Card, Col, Row, Alert} from 'react-bootstrap';
 
-const BASE_URL = 'http://10.11.50.11:5000'; // Replace with your backend server URL
+const BASE_URL = 'http://10.11.50.11:5000';
 const socket = io(BASE_URL);
 
 const MainPageDonor = () => {
@@ -32,13 +32,10 @@ const MainPageDonor = () => {
     useEffect(() => {
         // Validate user session and role
         if (!user.username || user.role !== 'donor') {
-            console.error('Unauthorized access or invalid session. Redirecting to login.');
             alert('Unauthorized access! Redirecting to login page.');
             navigate('/login');
             return;
         }
-
-        console.log('User verified as donor:', user.username);
 
         fetchDonations();
 
@@ -57,22 +54,11 @@ const MainPageDonor = () => {
             setDonations((prevDonations) => prevDonations.filter((item) => item._id !== deletedId));
         });
 
-        socket.on('foodItemClaimedUpdate', ({foodItemId, claimedByOrg}) => {
-            setDonations((prevDonations) =>
-                prevDonations.map((item) =>
-                    item._id === foodItemId
-                        ? {...item, status: 'Claimed', claimedByOrg}
-                        : item
-                )
-            );
-        });
-
         return () => {
             // Clean up socket listeners
             socket.off('foodItemAdded');
             socket.off('foodItemUpdated');
             socket.off('foodItemDeleted');
-            socket.off('foodItemClaimedUpdate');
         };
     }, [user, navigate]);
 
@@ -154,8 +140,8 @@ const MainPageDonor = () => {
                     Thank you for contributing to reducing food wastage.
                 </p>
 
-                {error && <div className="alert alert-danger text-center">{error}</div>}
-                {successMessage && <div className="alert alert-success text-center">{successMessage}</div>}
+                {error && <Alert variant="danger" className="text-center">{error}</Alert>}
+                {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
 
                 <div className="text-center my-4">
                     <Button className="btn-success btn-lg" onClick={() => setShowModal(true)}>
@@ -266,14 +252,12 @@ const MainPageDonor = () => {
                                                 <li>Shelf Life: {donation.shelfLife} hours</li>
                                                 <li>Veg/Non-Veg: {donation.vegStatus}</li>
                                                 <li>Packed: {donation.packed ? 'Yes' : 'No'}</li>
-                                                <li>
-                                                    Status:{' '}
-                                                    <span className={`status ${donation.status?.toLowerCase()}`}>
-                                                        {donation.status}
-                                                    </span>
-                                                </li>
+                                                <li>Status: {donation.status}</li>
                                                 {donation.status === 'Claimed' && (
-                                                    <li>Claimed By: {donation.claimedByOrg}</li>
+                                                    <li>
+                                                        Claimed By: {donation.claimedBy?.organizationName || 'N/A'} (
+                                                        {donation.claimedBy?.username || 'N/A'})
+                                                    </li>
                                                 )}
                                             </ul>
                                         </Card.Body>

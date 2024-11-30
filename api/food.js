@@ -13,14 +13,15 @@ const protect = async (req, res, next) => {
             req.user = await User.findById(decoded.id).select('-password');
             next();
         } catch (error) {
-            return res.status(401).json({message: 'Not authorized'});
+            return res.status(401).json({message: 'Not authorized, invalid token', error: error.message});
         }
     } else {
-        return res.status(401).json({message: 'Not authorized, no token'});
+        return res.status(401).json({message: 'Not authorized, no token provided'});
     }
 };
 
 const foodRoutes = (io) => {
+    // Create a new food donation
     router.post('/', protect, async (req, res) => {
         const {foodItem, description, quantity, vegStatus, packed, shelfLife} = req.body;
 
@@ -44,19 +45,21 @@ const foodRoutes = (io) => {
             io.emit('foodItemAdded', newFoodItem);
             res.status(201).json(newFoodItem);
         } catch (error) {
-            res.status(400).json({message: 'Food item creation failed', error: error.message});
+            res.status(500).json({message: 'Food item creation failed', error: error.message});
         }
     });
 
+    // Get all donations for the logged-in donor
     router.get('/', protect, async (req, res) => {
         try {
-            const foodItems = await FoodItem.find({donor: req.user._id});
+            const foodItems = await FoodItem.find({donor: req.user._id}).populate('claimedBy', 'username organizationName');
             res.status(200).json(foodItems);
         } catch (error) {
             res.status(500).json({message: 'Error fetching food items', error: error.message});
         }
     });
 
+    // Update the status of a food donation
     router.put('/:id', protect, async (req, res) => {
         const {id} = req.params;
         const {status} = req.body;
@@ -75,10 +78,11 @@ const foodRoutes = (io) => {
             io.emit('foodItemUpdated', updatedFoodItem);
             res.status(200).json(updatedFoodItem);
         } catch (error) {
-            res.status(500).json({message: 'Server error', error: error.message});
+            res.status(500).json({message: 'Error updating food item', error: error.message});
         }
     });
 
+    // Delete a food donation
     router.delete('/:id', protect, async (req, res) => {
         const {id} = req.params;
 
@@ -89,35 +93,41 @@ const foodRoutes = (io) => {
             }
 
             if (foodItem.donor.toString() !== req.user._id.toString()) {
-                return res.status(401).json({message: 'Not authorized to delete this food item'});
+                return res.status(403).json({message: 'Not authorized to delete this food item'});
             }
 
             await foodItem.remove();
             io.emit('foodItemDeleted', {foodItemId: id});
             res.status(200).json({message: 'Food item deleted successfully'});
         } catch (error) {
-            res.status(500).json({message: 'Server error', error: error.message});
+            res.status(500).json({message: 'Error deleting food item', error: error.message});
         }
     });
 
+    // Get all available food donations
     router.get('/available', protect, async (req, res) => {
         try {
-            const foodItems = await FoodItem.find({status: 'Available'}).populate('donor', 'username location');
+            const foodItems = await FoodItem.find({status: 'Available'}).populate('donor', 'username organizationName location');
             res.status(200).json(foodItems);
         } catch (error) {
             res.status(500).json({message: 'Error fetching available food items', error: error.message});
         }
     });
 
+    // Claim a food donation
     router.post('/claim/:id', protect, async (req, res) => {
+        const {id} = req.params;
+
         try {
-            const foodItem = await FoodItem.findById(req.params.id);
+            const foodItem = await FoodItem.findById(id);
             if (!foodItem) {
                 return res.status(404).json({message: 'Food item not found'});
             }
+
             if (foodItem.status !== 'Available') {
                 return res.status(400).json({message: 'Food item is not available'});
             }
+
             foodItem.status = 'Claimed';
             foodItem.claimedBy = req.user._id;
             await foodItem.save();
@@ -125,16 +135,17 @@ const foodRoutes = (io) => {
             io.emit('foodItemClaimedUpdate', {foodItemId: foodItem._id});
             res.status(200).json({message: 'Food item claimed successfully', foodItem});
         } catch (error) {
-            res.status(500).json({message: 'Server error', error: error.message});
+            res.status(500).json({message: 'Error claiming food item', error: error.message});
         }
     });
 
+    // Get all claimed food donations for the logged-in client
     router.get('/claimed', protect, async (req, res) => {
         try {
             const claimedItems = await FoodItem.find({
                 status: 'Claimed',
                 claimedBy: req.user._id,
-            }).populate('donor', 'username location');
+            }).populate('donor', 'username organizationName location');
             res.status(200).json(claimedItems);
         } catch (error) {
             res.status(500).json({message: 'Error fetching claimed food items', error: error.message});
