@@ -5,10 +5,41 @@ import './Login.css';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        // Handle login logic here (e.g., make API call)
+        setError('');
+
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Assuming you receive a token and the user's role in response
+                const { token, role } = data;
+                localStorage.setItem('token', token);
+
+                alert('Login successful');
+                if (role === 'donor') {
+                    window.location.href = '/donor'; // Redirect to donor main page
+                } else if (role === 'client') {
+                    window.location.href = '/client'; // Redirect to client main page
+                }
+            } else {
+                setError(data.error || 'Login failed. Please check your credentials.');
+            }
+        } catch (err) {
+            setError('An error occurred while logging in. Please try again later.');
+            console.error('Login error:', err);
+        }
     };
 
     return (
@@ -16,6 +47,7 @@ const Login = () => {
             <Navbar />
             <div className="login-container container">
                 <h2>Login to Aaharamitra</h2>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={handleLogin}>
                     <div className="mb-3">
                         <label className="form-label">Email address</label>
@@ -43,6 +75,6 @@ const Login = () => {
             </div>
         </div>
     );
-}
+};
 
 export default Login;
