@@ -1,70 +1,97 @@
-/* Main Page Client Container */
+/* MainPageClient.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
 .mainpage-client-container {
-    margin-top: 40px;
-    background: #ffffff;
-    padding: 20px 30px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-/* Heading Styles */
-.mainpage-client-container h2 {
-    font-weight: bold;
-    color: #2c3e50;
-}
-
-/* Available Donations Table Styling */
-.table {
-    margin-top: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
     border-radius: 8px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
 }
 
-.table thead {
-    background-color: #f8f9fa;
+.mainpage-client-container h2 {
+    color: #2c3e50;
+    font-weight: bold;
 }
 
-.table th,
-.table td {
+.mainpage-client-container p {
+    font-size: 1rem;
+    color: #7f8c8d;
+}
+
+.available-list {
+    margin-top: 30px;
+}
+
+.available-list h4 {
+    color: #34495e;
+    font-weight: bold;
+}
+
+.table {
+    background-color: #ffffff;
     text-align: center;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table-bordered th,
+.table-bordered td {
     vertical-align: middle;
 }
 
-/* Claim Button Styling */
-.btn-primary {
-    padding: 5px 15px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-}
-
-.btn-primary:hover {
-    background-color: #004085;
-}
-
-/* Status Label Styling */
 .status {
     padding: 5px 10px;
     border-radius: 5px;
+    color: white;
     font-weight: bold;
 }
 
-/* Status Colors */
 .status.available {
-    background-color: #28a745;
-    color: #fff;
+    background-color: #27ae60;
 }
 
 .status.claimed {
-    background-color: #ffc107;
-    color: #fff;
+    background-color: #e74c3c;
 }
 
-/* Responsive Design */
-@media (max-width: 576px) {
-    .mainpage-client-container {
-        padding: 15px 20px;
-    }
+.status.delivered {
+    background-color: #2980b9;
+}
 
-    .table {
-        font-size: 0.9rem;
-    }
+.btn-primary.btn-sm {
+    padding: 5px 15px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary.btn-sm:hover {
+    background-color: #145a86;
+}
+
+.alert {
+    margin-top: 20px;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+.alert-danger {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.alert-success {
+    background-color: #4caf50;
+    color: white;
 }

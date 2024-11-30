@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import Navbar from '../Navbar/Navbar';
 import './Signup.css';
 
+const BASE_URL = 'http://10.11.50.11:5000';  // Base URL for the API
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCO2csyZIgTNfjonjIg3utAnqJeN7CKnWs';
 
 const Signup = () => {
@@ -11,13 +12,12 @@ const Signup = () => {
         password: '',
         organizationName: '',
         location: '',
-        coordinates: { latitude: '', longitude: '' },
+        coordinates: {latitude: '', longitude: ''},
         phone: '',
         role: '',
     });
     const [error, setError] = useState('');
-    const [map, setMap] = useState(null);
-    const [marker, setMarker] = useState(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
 
     useEffect(() => {
         const loadGoogleMaps = () => {
@@ -26,18 +26,24 @@ const Signup = () => {
                 googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
                 googleMapsScript.async = true;
                 googleMapsScript.defer = true;
-                googleMapsScript.onload = initMap;
+                googleMapsScript.onload = () => setMapLoaded(true);
                 document.body.appendChild(googleMapsScript);
             } else {
-                initMap();
+                setMapLoaded(true);
             }
         };
 
         loadGoogleMaps();
     }, []);
 
+    useEffect(() => {
+        if (mapLoaded) {
+            initMap();
+        }
+    }, [mapLoaded]);
+
     const initMap = () => {
-        const telanganaCenter = { lat: 17.123184, lng: 79.208824 };
+        const telanganaCenter = {lat: 17.123184, lng: 79.208824};
 
         const mapInstance = new window.google.maps.Map(document.getElementById('map'), {
             center: telanganaCenter,
@@ -63,9 +69,6 @@ const Signup = () => {
             }
         });
 
-        setMap(mapInstance);
-        setMarker(markerInstance);
-
         initAutocomplete(mapInstance, markerInstance);
     };
 
@@ -73,7 +76,7 @@ const Signup = () => {
         const autocomplete = new window.google.maps.places.Autocomplete(
             document.getElementById('location'),
             {
-                componentRestrictions: { country: 'in' },
+                componentRestrictions: {country: 'in'},
                 fields: ['geometry', 'formatted_address'],
             }
         );
@@ -91,21 +94,21 @@ const Signup = () => {
             setFormData((prevFormData) => ({
                 ...prevFormData,
                 location: place.formatted_address || '',
-                coordinates: { latitude: lat, longitude: lng },
+                coordinates: {latitude: lat, longitude: lng},
             }));
 
-            mapInstance.setCenter({ lat, lng });
+            mapInstance.setCenter({lat, lng});
             mapInstance.setZoom(14);
-            markerInstance.setPosition({ lat, lng });
+            markerInstance.setPosition({lat, lng});
         });
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({...formData, [e.target.name]: e.target.value});
     };
 
     const handleRoleSelect = (role) => {
-        setFormData({ ...formData, role });
+        setFormData({...formData, role});
     };
 
     const handleSignup = async (e) => {
@@ -118,9 +121,9 @@ const Signup = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/register', {
+            const response = await fetch(`${BASE_URL}/api/auth/register`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(formData),
             });
 
@@ -138,7 +141,7 @@ const Signup = () => {
 
     return (
         <div>
-            <Navbar />
+            <Navbar/>
             <div className="signup-container">
                 <div className="form-container">
                     <h2>Signup for Aaharamitra</h2>
@@ -211,7 +214,7 @@ const Signup = () => {
                                 required
                             />
                         </div>
-                        <div className="role-selection">
+                        <div className="role-selection mb-3">
                             <div
                                 className={`role-option ${formData.role === 'donor' ? 'selected' : ''}`}
                                 onClick={() => handleRoleSelect('donor')}
@@ -225,7 +228,9 @@ const Signup = () => {
                                 Client
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-primary">Signup</button>
+                        <button type="submit" className="btn btn-primary">
+                            Signup
+                        </button>
                     </form>
                 </div>
                 <div id="map-container">

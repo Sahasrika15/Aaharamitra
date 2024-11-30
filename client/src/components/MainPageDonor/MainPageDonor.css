@@ -1,79 +1,169 @@
-/* Main Page Donor Container */
+/* MainPageDonor.css */
+
+/* General container styles */
 .mainpage-donor-container {
-    margin-top: 40px;
-    background: #ffffff;
-    padding: 20px 30px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
+    padding: 2rem;
+    background-color: #f7f7f7;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Heading Styles */
+/* Welcome text */
 .mainpage-donor-container h2 {
-    font-weight: bold;
-    color: #2c3e50;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #333;
 }
 
-/* Add New Donation Button */
-.btn-success {
-    padding: 15px 25px;
-    border-radius: 8px;
+.mainpage-donor-container p {
     font-size: 1.1rem;
+    color: #666;
 }
 
-.btn-success:hover {
-    background-color: #218838;
+/* Success and error messages */
+.alert {
+    margin-top: 1rem;
 }
 
-/* Donation Table Styling */
-.table {
-    margin-top: 20px;
-    border-radius: 8px;
+/* Add donation button */
+.btn-success.btn-lg {
+    padding: 0.75rem 2rem;
+    font-size: 1.25rem;
 }
 
-.table thead {
-    background-color: #f8f9fa;
+/* Modal styling */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.table th,
-.table td {
-    text-align: center;
-    vertical-align: middle;
+.modal-header {
+    background-color: #5cb85c;
+    color: #fff;
+    border-bottom: none;
 }
 
-/* Status Label Styling */
-.status {
-    padding: 5px 10px;
+.modal-title {
+    font-size: 1.75rem;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: #333;
+}
+
+.form-control {
     border-radius: 5px;
+    box-shadow: none;
+    border: 1px solid #ccc;
+}
+
+.btn-outline-success,
+.btn-outline-danger,
+.btn-outline-primary,
+.btn-outline-secondary {
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-success:hover {
+    background-color: #5cb85c;
+    color: #fff;
+}
+
+.btn-outline-danger:hover {
+    background-color: #d9534f;
+    color: #fff;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover {
+    color: #fff;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+/* Donation card styles */
+.donation-list {
+    margin-top: 2rem;
+}
+
+.donation-list h4 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #007bff;
+    margin-bottom: 1rem;
+}
+
+.card-text {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.list-unstyled {
+    font-size: 0.95rem;
+    color: #333;
+    line-height: 1.5;
+}
+
+/* Donation status styles */
+.status {
     font-weight: bold;
 }
 
-/* Status Colors */
+.status.available {
+    color: #5cb85c;
+}
+
+.status.claimed {
+    color: #f0ad4e;
+}
+
 .status.delivered {
-    background-color: #28a745;
-    color: #fff;
+    color: #d9534f;
 }
 
-.status.pending {
-    background-color: #ffc107;
-    color: #fff;
+/* Button spacing */
+.btn + .btn {
+    margin-left: 10px;
 }
 
-.status.in-transit {
-    background-color: #17a2b8;
-    color: #fff;
-}
-
-/* Responsive Design */
-@media (max-width: 576px) {
+/* Responsive card layout */
+@media (max-width: 767px) {
     .mainpage-donor-container {
-        padding: 15px 20px;
+        padding: 1rem;
     }
 
-    .btn-success {
-        width: 100%;
-    }
-
-    .table {
-        font-size: 0.9rem;
+    .card {
+        margin-bottom: 1rem;
     }
 }
