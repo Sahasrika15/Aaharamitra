@@ -1,0 +1,43 @@
+/* Navbar Container */
+.navbar {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease-in-out;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #ffb400 !important; /* Brand color to match with Aaharamitra's theme */
+}
+
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffb400 !important; /* Highlight on hover to attract attention */
+}
+
+/* Login Button */
+.btn-outline-light {
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    font-weight: 500;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline-light:hover {
+    background-color: #ffffff;
+    color: #2c3e50;
+}
+
+/* Toggler Button for Small Devices */
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler-icon {
+    background-color: #ffffff;
+}

@@ -1,0 +1,106 @@
+/* General Page Styling */
+.home-container {
+    font-family: 'Arial, sans-serif';
+    line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.navbar .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Hero Section */
+.hero-section {
+    background-image: url('https://example.com/your-hero-image.jpg'); /* Replace with a suitable image URL */
+    background-size: cover;
+    background-position: center;
+    padding: 100px 20px;
+    color: #fff;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.hero-section p {
+    font-size: 1.25rem;
+    margin-top: 20px;
+}
+
+.hero-section .cta-button {
+    margin-top: 30px;
+}
+
+/* About Section */
+#about {
+    background-color: #f9f9f9;
+    padding: 60px 0;
+}
+
+#about h2 {
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Statistics Section */
+#stats .stat-box {
+    transition: transform 0.3s ease-in-out;
+}
+
+#stats .stat-box:hover {
+    transform: translateY(-5px);
+}
+
+/* Leaderboard Section */
+#leaderboard {
+    padding: 60px 0;
+}
+
+#leaderboard .table {
+    margin-top: 20px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Impact Section */
+#impact .impact-box {
+    transition: transform 0.3s ease-in-out;
+}
+
+#impact .impact-box:hover {
+    transform: translateY(-5px);
+}
+
+/* Footer */
+footer {
+    background-color: #222;
+    color: #fff;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+/* Buttons */
+.btn-warning {
+    background-color: #ffb400;
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: #e6a600;
+}
+
+.btn-outline-light {
+    border-color: #fff;
+    color: #fff;
+}
+
+.btn-outline-light:hover {
+    background-color: #fff;
+    color: #000;
+}

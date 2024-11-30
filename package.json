@@ -1,0 +1,16 @@
+{
+  "name": "g50",
+  "version": "1.0.0",
+  "description": "Advanced Food Redistribution Network For Communities",
+  "main": "index.js",
+  "scripts": {
+    "start": "npm-run-all --parallel start:server start:client",
+    "start:server": "cd api && npm start",
+    "start:client": "cd client && npm start"
+  },
+  "private": true,
+  "workspaces": [
+    "api",
+    "client"
+  ]
+}

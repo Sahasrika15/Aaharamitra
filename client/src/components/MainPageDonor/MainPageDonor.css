@@ -1,0 +1,79 @@
+/* Main Page Donor Container */
+.mainpage-donor-container {
+    margin-top: 40px;
+    background: #ffffff;
+    padding: 20px 30px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Heading Styles */
+.mainpage-donor-container h2 {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Add New Donation Button */
+.btn-success {
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* Donation Table Styling */
+.table {
+    margin-top: 20px;
+    border-radius: 8px;
+}
+
+.table thead {
+    background-color: #f8f9fa;
+}
+
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Status Label Styling */
+.status {
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* Status Colors */
+.status.delivered {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status.pending {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+.status.in-transit {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+    .mainpage-donor-container {
+        padding: 15px 20px;
+    }
+
+    .btn-success {
+        width: 100%;
+    }
+
+    .table {
+        font-size: 0.9rem;
+    }
+}
