@@ -24,26 +24,47 @@ const Login = () => {
 
             const data = await response.json();
 
+            console.log('Login response data:', data); // Debug log
+
             if (response.ok) {
-                const {token, role} = data;
+                const {token, role, userId, username, organizationName, location, coordinates} = data;
 
-                if (token && role) {
-                    localStorage.clear();
+                // Validate the response structure
+                if (!token || !role || !userId) {
+                    setError('Invalid response from the server. Please try again later.');
+                    console.error('Invalid response structure:', data);
+                    return;
+                }
 
-                    localStorage.setItem('token', token);
-                    localStorage.setItem('role', role);
+                // Clear existing session storage
+                sessionStorage.clear();
 
-                    alert('Login successful');
+                // Save individual details in session storage
+                sessionStorage.setItem('token', token);
+                sessionStorage.setItem('role', role);
+                sessionStorage.setItem('userId', userId);
+                sessionStorage.setItem('username', username || '');
+                sessionStorage.setItem('organizationName', organizationName || '');
+                sessionStorage.setItem('location', location || '');
+                sessionStorage.setItem('latitude', coordinates?.latitude || '');
+                sessionStorage.setItem('longitude', coordinates?.longitude || '');
 
-                    if (role === 'donor') {
-                        window.location.href = '/donor';
-                    } else if (role === 'client') {
-                        window.location.href = '/client';
-                    } else {
-                        setError('Invalid role assigned, please contact support.');
-                    }
+                console.log('User details saved individually:', {
+                    token,
+                    role,
+                    userId,
+                    username,
+                });
+
+                alert('Login successful');
+
+                // Redirect based on the role
+                if (role === 'donor') {
+                    window.location.href = '/donor';
+                } else if (role === 'client') {
+                    window.location.href = '/client';
                 } else {
-                    setError('Invalid response from the server, please try again later.');
+                    setError('Invalid role assigned, please contact support.');
                 }
             } else {
                 setError(data.message || 'Login failed. Please check your credentials.');
@@ -53,6 +74,7 @@ const Login = () => {
             console.error('Login error:', err);
         }
     };
+
 
     return (
         <div>
@@ -82,8 +104,12 @@ const Login = () => {
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary btn-block">Login</button>
-                        <a href="/signup" className="login-link">Don't have an account? Sign up here</a>
+                        <button type="submit" className="btn btn-primary btn-block">
+                            Login
+                        </button>
+                        <a href="/signup" className="login-link">
+                            Don't have an account? Sign up here
+                        </a>
                     </form>
                 </div>
             </div>

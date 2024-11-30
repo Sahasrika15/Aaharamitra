@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { io } from 'socket.io-client';
+import React, {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {io} from 'socket.io-client';
 import Navbar from '../Navbar/Navbar';
 import './MainPageDonor.css';
-import { Modal, Button, Form, Card, Col, Row } from 'react-bootstrap';
+import {Modal, Button, Form, Card, Col, Row} from 'react-bootstrap';
 
 const BASE_URL = 'http://10.11.50.11:5000'; // Replace with your backend server URL
 const socket = io(BASE_URL);
 
 const MainPageDonor = () => {
+    const navigate = useNavigate();
     const [donations, setDonations] = useState([]);
     const [showModal, setShowModal] = useState(false);
     const [newDonation, setNewDonation] = useState({
@@ -21,9 +23,26 @@ const MainPageDonor = () => {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
+    // Retrieve user details from sessionStorage
+    const user = {
+        username: sessionStorage.getItem('username'),
+        role: sessionStorage.getItem('role'),
+    };
+
     useEffect(() => {
+        // Validate user session and role
+        if (!user.username || user.role !== 'donor') {
+            console.error('Unauthorized access or invalid session. Redirecting to login.');
+            alert('Unauthorized access! Redirecting to login page.');
+            navigate('/login');
+            return;
+        }
+
+        console.log('User verified as donor:', user.username);
+
         fetchDonations();
 
+        // Socket.io event listeners
         socket.on('foodItemAdded', (newItem) => {
             setDonations((prevDonations) => [...prevDonations, newItem]);
         });
@@ -38,36 +57,38 @@ const MainPageDonor = () => {
             setDonations((prevDonations) => prevDonations.filter((item) => item._id !== deletedId));
         });
 
-        socket.on('foodItemClaimedUpdate', ({ foodItemId, claimedByOrg }) => {
+        socket.on('foodItemClaimedUpdate', ({foodItemId, claimedByOrg}) => {
             setDonations((prevDonations) =>
                 prevDonations.map((item) =>
                     item._id === foodItemId
-                        ? { ...item, status: 'Claimed', claimedByOrg }
+                        ? {...item, status: 'Claimed', claimedByOrg}
                         : item
                 )
             );
         });
 
         return () => {
+            // Clean up socket listeners
             socket.off('foodItemAdded');
             socket.off('foodItemUpdated');
             socket.off('foodItemDeleted');
             socket.off('foodItemClaimedUpdate');
         };
-    }, []);
+    }, [user, navigate]);
 
     const fetchDonations = async () => {
         try {
             const response = await fetch(`${BASE_URL}/api/food`, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 },
             });
             if (response.ok) {
                 const data = await response.json();
                 setDonations(data);
             } else {
-                throw new Error('Failed to fetch donations.');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch donations.');
             }
         } catch (error) {
             setError(error.message || 'An error occurred while fetching donations.');
@@ -84,14 +105,14 @@ const MainPageDonor = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 },
                 body: JSON.stringify(newDonation),
             });
 
             if (response.ok) {
                 const newItem = await response.json();
-                socket.emit('newFoodItem', newItem);
+                setDonations((prevDonations) => [...prevDonations, newItem]);
                 setNewDonation({
                     foodItem: '',
                     description: '',
@@ -103,8 +124,8 @@ const MainPageDonor = () => {
                 setSuccessMessage('Donation added successfully!');
                 setShowModal(false);
             } else {
-                const data = await response.json();
-                throw new Error(data.message || 'Failed to add donation.');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add donation.');
             }
         } catch (error) {
             setError(error.message || 'An error occurred while adding the donation.');
@@ -112,24 +133,26 @@ const MainPageDonor = () => {
     };
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setNewDonation({ ...newDonation, [name]: value });
+        const {name, value} = e.target;
+        setNewDonation({...newDonation, [name]: value});
     };
 
     const handlePackedChange = (packed) => {
-        setNewDonation({ ...newDonation, packed });
+        setNewDonation({...newDonation, packed});
     };
 
     const handleVegStatusChange = (vegStatus) => {
-        setNewDonation({ ...newDonation, vegStatus });
+        setNewDonation({...newDonation, vegStatus});
     };
 
     return (
         <div>
-            <Navbar />
+            <Navbar/>
             <div className="mainpage-donor-container container">
-                <h2 className="text-center mt-4 mb-3">Welcome, Donor!</h2>
-                <p className="text-center text-muted mb-4">Thank you for contributing to reducing food wastage.</p>
+                <h2 className="text-center mt-4 mb-3">Welcome, {user.username}!</h2>
+                <p className="text-center text-muted mb-4">
+                    Thank you for contributing to reducing food wastage.
+                </p>
 
                 {error && <div className="alert alert-danger text-center">{error}</div>}
                 {successMessage && <div className="alert alert-success text-center">{successMessage}</div>}
@@ -232,7 +255,7 @@ const MainPageDonor = () => {
                         {donations.length === 0 ? (
                             <p className="text-center w-100">No donations added yet.</p>
                         ) : (
-                            donations.map((donation, index) => (
+                            donations.map((donation) => (
                                 <Col key={donation._id}>
                                     <Card className="h-100 shadow">
                                         <Card.Body>
@@ -245,7 +268,7 @@ const MainPageDonor = () => {
                                                 <li>Packed: {donation.packed ? 'Yes' : 'No'}</li>
                                                 <li>
                                                     Status:{' '}
-                                                    <span className={`status ${donation.status.toLowerCase()}`}>
+                                                    <span className={`status ${donation.status?.toLowerCase()}`}>
                                                         {donation.status}
                                                     </span>
                                                 </li>

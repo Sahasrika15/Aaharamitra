@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {io} from 'socket.io-client';
 import Navbar from '../Navbar/Navbar';
 import './MainPageClient.css';
@@ -7,12 +8,28 @@ const BASE_URL = 'http://10.11.50.11:5000';
 const socket = io(BASE_URL);
 
 const MainPageClient = () => {
+    const navigate = useNavigate();
     const [availableDonations, setAvailableDonations] = useState([]);
     const [claimedDonations, setClaimedDonations] = useState([]);
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
+    // Retrieve user details from sessionStorage
+    const user = {
+        username: sessionStorage.getItem('username'),
+        role: sessionStorage.getItem('role'),
+    };
+
     useEffect(() => {
+        // Check if the user is logged in and has the 'client' role
+        if (!user.username || user.role !== 'client') {
+            alert('Unauthorized access! Redirecting to login page.');
+            navigate('/login'); // Redirect to login page if not authorized
+            return;
+        }
+
+        console.log('User verified as client:', user.username);
+
         fetchDonations();
 
         socket.on('foodItemAdded', (newItem) => {
@@ -33,7 +50,7 @@ const MainPageClient = () => {
             socket.off('foodItemClaimedUpdate');
             socket.off('foodItemDeleted');
         };
-    }, []);
+    }, [user, navigate]);
 
     const fetchDonations = () => {
         fetchAvailableDonations();
@@ -44,14 +61,15 @@ const MainPageClient = () => {
         try {
             const response = await fetch(`${BASE_URL}/api/food/available`, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 },
             });
             if (response.ok) {
                 const data = await response.json();
                 setAvailableDonations(data);
             } else {
-                throw new Error('Failed to fetch available donations.');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch available donations.');
             }
         } catch (error) {
             setError(error.message || 'Error fetching available donations.');
@@ -62,14 +80,15 @@ const MainPageClient = () => {
         try {
             const response = await fetch(`${BASE_URL}/api/food/claimed`, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 },
             });
             if (response.ok) {
                 const data = await response.json();
                 setClaimedDonations(data);
             } else {
-                throw new Error('Failed to fetch claimed donations.');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch claimed donations.');
             }
         } catch (error) {
             setError(error.message || 'Error fetching claimed donations.');
@@ -84,7 +103,7 @@ const MainPageClient = () => {
             const response = await fetch(`${BASE_URL}/api/food/claim/${donationId}`, {
                 method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 },
             });
 
@@ -93,8 +112,8 @@ const MainPageClient = () => {
                 socket.emit('foodItemClaimed', {foodItemId: donationId});
                 fetchDonations();
             } else {
-                const data = await response.json();
-                throw new Error(data.message || 'Failed to claim the donation.');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to claim the donation.');
             }
         } catch (error) {
             setError(error.message || 'Error claiming the donation.');
@@ -105,7 +124,7 @@ const MainPageClient = () => {
         <div>
             <Navbar/>
             <div className="mainpage-client-container container">
-                <h2 className="text-center mt-4">Welcome, Recipient!</h2>
+                <h2 className="text-center mt-4">Welcome, {user.username}!</h2>
                 <p className="text-center text-muted">
                     Browse and claim available food donations to help those in need.
                 </p>

@@ -1,43 +1,65 @@
-/* Navbar Container */
+/* General navbar styling */
 .navbar {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
 }
 
 .navbar-brand {
+    font-size: 24px;
     font-weight: bold;
-    font-size: 1.5rem;
-    color: #ffb400 !important; /* Brand color to match with Aaharamitra's theme */
+    color: #ffffff;
+    text-transform: uppercase;
+    transition: color 0.3s ease-in-out;
 }
 
+.navbar-brand:hover {
+    color: #f8d210;
+    text-decoration: none;
+}
+
+/* Links in the navbar */
 .navbar-nav .nav-link {
-    color: #ffffff !important;
-    font-weight: 500;
-    transition: color 0.3s ease;
+    font-size: 16px;
+    color: #ffffff;
+    transition: color 0.3s ease-in-out;
 }
 
 .navbar-nav .nav-link:hover {
-    color: #ffb400 !important; /* Highlight on hover to attract attention */
+    color: #f8d210;
+    text-decoration: none;
 }
 
-/* Login Button */
+/* Active link */
+.navbar-nav .nav-link.active {
+    color: #f8d210;
+    font-weight: bold;
+}
+
+/* Navbar button (e.g., Logout button) */
 .btn-outline-light {
-    border: 1px solid #ffffff;
     color: #ffffff;
-    font-weight: 500;
-    transition: background-color 0.3s, color 0.3s;
+    border-color: #ffffff;
+    transition: all 0.3s ease-in-out;
 }
 
 .btn-outline-light:hover {
-    background-color: #ffffff;
-    color: #2c3e50;
+    background-color: #f8d210;
+    border-color: #f8d210;
+    color: #000000;
 }
 
-/* Toggler Button for Small Devices */
+/* Navbar toggler for smaller screens */
 .navbar-toggler {
     border: none;
+    color: #ffffff;
 }
 
 .navbar-toggler-icon {
     background-color: #ffffff;
+    border-radius: 3px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.navbar-toggler:hover .navbar-toggler-icon {
+    background-color: #f8d210;
 }
