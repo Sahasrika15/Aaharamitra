@@ -4,7 +4,7 @@ import {io} from 'socket.io-client';
 import Navbar from '../Navbar/Navbar';
 import './MainPageClient.css';
 
-const BASE_URL = 'http://10.11.50.11:5000';
+const BASE_URL = 'http://localhost:5000';
 const socket = io(BASE_URL);
 
 const MainPageClient = () => {

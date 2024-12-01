@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Navbar from '../Navbar/Navbar';
 import './Login.css';
 
-const BASE_URL = 'http://10.11.50.11:5000'; // Base URL for the API
+const BASE_URL = 'http://localhost:5000'; // Base URL for the API
 
 const Login = () => {
     const [username, setUsername] = useState('');

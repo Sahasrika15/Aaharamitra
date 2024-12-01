@@ -1,11 +1,11 @@
-import React, {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {io} from 'socket.io-client';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import Navbar from '../Navbar/Navbar';
 import './MainPageDonor.css';
-import {Modal, Button, Form, Card, Col, Row, Alert} from 'react-bootstrap';
+import { Modal, Button, Form, Card, Col, Row, Alert } from 'react-bootstrap';
 
-const BASE_URL = 'http://10.11.50.11:5000';
+const BASE_URL = 'http://localhost:5000';
 const socket = io(BASE_URL);
 
 const MainPageDonor = () => {
@@ -23,14 +23,12 @@ const MainPageDonor = () => {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
 
-    // Retrieve user details from sessionStorage
     const user = {
         username: sessionStorage.getItem('username'),
         role: sessionStorage.getItem('role'),
     };
 
     useEffect(() => {
-        // Validate user session and role
         if (!user.username || user.role !== 'donor') {
             alert('Unauthorized access! Redirecting to login page.');
             navigate('/login');
@@ -39,7 +37,6 @@ const MainPageDonor = () => {
 
         fetchDonations();
 
-        // Socket.io event listeners
         socket.on('foodItemAdded', (newItem) => {
             setDonations((prevDonations) => [...prevDonations, newItem]);
         });
@@ -55,7 +52,6 @@ const MainPageDonor = () => {
         });
 
         return () => {
-            // Clean up socket listeners
             socket.off('foodItemAdded');
             socket.off('foodItemUpdated');
             socket.off('foodItemDeleted');
@@ -118,22 +114,45 @@ const MainPageDonor = () => {
         }
     };
 
+    const handleDeleteDonation = async (id) => {
+        setError('');
+        setSuccessMessage('');
+        try {
+            const response = await fetch(`${BASE_URL}/api/food/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('token')}`,
+                },
+            });
+
+            if (response.ok) {
+                setDonations((prevDonations) => prevDonations.filter((donation) => donation._id !== id));
+                setSuccessMessage('Donation deleted successfully!');
+            } else {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete donation.');
+            }
+        } catch (error) {
+            setError(error.message || 'An error occurred while deleting the donation.');
+        }
+    };
+
     const handleChange = (e) => {
-        const {name, value} = e.target;
-        setNewDonation({...newDonation, [name]: value});
+        const { name, value } = e.target;
+        setNewDonation({ ...newDonation, [name]: value });
     };
 
     const handlePackedChange = (packed) => {
-        setNewDonation({...newDonation, packed});
+        setNewDonation({ ...newDonation, packed });
     };
 
     const handleVegStatusChange = (vegStatus) => {
-        setNewDonation({...newDonation, vegStatus});
+        setNewDonation({ ...newDonation, vegStatus });
     };
 
     return (
         <div>
-            <Navbar/>
+            <Navbar />
             <div className="mainpage-donor-container container">
                 <h2 className="text-center mt-4 mb-3">Welcome, {user.username}!</h2>
                 <p className="text-center text-muted mb-4">
@@ -247,19 +266,15 @@ const MainPageDonor = () => {
                                         <Card.Body>
                                             <Card.Title>{donation.foodItem}</Card.Title>
                                             <Card.Text>{donation.description}</Card.Text>
-                                            <ul className="list-unstyled">
-                                                <li>Quantity: {donation.quantity}</li>
-                                                <li>Shelf Life: {donation.shelfLife} hours</li>
-                                                <li>Veg/Non-Veg: {donation.vegStatus}</li>
-                                                <li>Packed: {donation.packed ? 'Yes' : 'No'}</li>
-                                                <li>Status: {donation.status}</li>
-                                                {donation.status === 'Claimed' && (
-                                                    <li>
-                                                        Claimed By: {donation.claimedBy?.organizationName || 'N/A'} (
-                                                        {donation.claimedBy?.username || 'N/A'})
-                                                    </li>
-                                                )}
-                                            </ul>
+                                            <p>Quantity: {donation.quantity}</p>
+                                            <p>Shelf Life: {donation.shelfLife} hours</p>
+                                            <Button
+                                                variant="danger"
+                                                className="w-100"
+                                                onClick={() => handleDeleteDonation(donation._id)}
+                                            >
+                                                Delete Donation
+                                            </Button>
                                         </Card.Body>
                                     </Card>
                                 </Col>

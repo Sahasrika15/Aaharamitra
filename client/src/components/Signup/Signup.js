@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import Navbar from '../Navbar/Navbar';
 import './Signup.css';
 
-const BASE_URL = 'http://10.11.50.11:5000';  // Base URL for the API
+const BASE_URL = 'http://localhost:5000';  // Base URL for the API
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCO2csyZIgTNfjonjIg3utAnqJeN7CKnWs';
 
 const Signup = () => {
