@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {io} from 'socket.io-client';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import Navbar from '../Navbar/Navbar';
 import './MainPageClient.css';
+import { Table, Button, Alert } from 'react-bootstrap';
 
 const BASE_URL = 'http://localhost:5000';
 const socket = io(BASE_URL);
@@ -34,12 +35,12 @@ const MainPageClient = () => {
             setAvailableDonations((prev) => [...prev, newItem]);
         });
 
-        socket.on('foodItemClaimedUpdate', ({foodItemId}) => {
+        socket.on('foodItemClaimedUpdate', ({ foodItemId }) => {
             setAvailableDonations((prev) => prev.filter((item) => item._id !== foodItemId));
             fetchClaimedDonations();
         });
 
-        socket.on('foodItemDeleted', ({foodItemId}) => {
+        socket.on('foodItemDeleted', ({ foodItemId }) => {
             setAvailableDonations((prev) => prev.filter((item) => item._id !== foodItemId));
         });
 
@@ -97,7 +98,7 @@ const MainPageClient = () => {
     const filterDonationsWithin10km = (donations) => {
         return donations.filter((donation) => {
             if (!donation.coordinates) return false;
-            const {latitude, longitude} = donation.coordinates;
+            const { latitude, longitude } = donation.coordinates;
             return isWithin10km(user.latitude, user.longitude, latitude, longitude);
         });
     };
@@ -143,19 +144,19 @@ const MainPageClient = () => {
 
     return (
         <div>
-            <Navbar/>
+            <Navbar />
             <div className="mainpage-client-container container">
                 <h2 className="text-center mt-4">Welcome, {user.username}!</h2>
                 <p className="text-center text-muted">
                     Browse and claim available food donations to help those in need.
                 </p>
 
-                {error && <div className="alert alert-danger text-center">{error}</div>}
-                {successMessage && <div className="alert alert-success text-center">{successMessage}</div>}
+                {error && <Alert variant="danger" className="text-center">{error}</Alert>}
+                {successMessage && <Alert variant="success" className="text-center">{successMessage}</Alert>}
 
                 <div className="available-list">
                     <h4 className="mb-4">Available Donations</h4>
-                    <table className="table table-bordered table-hover shadow">
+                    <Table responsive bordered hover className="shadow">
                         <thead className="table-light">
                         <tr>
                             <th>#</th>
@@ -195,24 +196,25 @@ const MainPageClient = () => {
                                     </td>
                                     <td>
                                         {donation.status === 'Available' && (
-                                            <button
-                                                className="btn btn-primary btn-sm"
+                                            <Button
+                                                variant="primary"
+                                                size="sm"
                                                 onClick={() => handleClaimDonation(donation._id)}
                                             >
                                                 Claim
-                                            </button>
+                                            </Button>
                                         )}
                                     </td>
                                 </tr>
                             ))
                         )}
                         </tbody>
-                    </table>
+                    </Table>
                 </div>
 
                 <div className="claimed-list mt-5">
                     <h4 className="mb-4">Your Claimed Donations</h4>
-                    <table className="table table-bordered table-hover shadow">
+                    <Table responsive bordered hover className="shadow">
                         <thead className="table-light">
                         <tr>
                             <th>#</th>
@@ -253,7 +255,7 @@ const MainPageClient = () => {
                             ))
                         )}
                         </tbody>
-                    </table>
+                    </Table>
                 </div>
             </div>
         </div>
