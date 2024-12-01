@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Navbar from '../Navbar/Navbar';
 import './Login.css';
+import backgroundImage from './pic.jpg'; // Import background image
 
-const BASE_URL = 'http://localhost:5000'; // Base URL for the API
+const BASE_URL = 'http://localhost:5000';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -19,27 +20,20 @@ const Login = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({username, password}),
+                body: JSON.stringify({ username, password }),
             });
 
             const data = await response.json();
 
-            console.log('Login response data:', data); // Debug log
-
             if (response.ok) {
-                const {token, role, userId, username, organizationName, location, coordinates} = data;
+                const { token, role, userId, username, organizationName, location, coordinates } = data;
 
-                // Validate the response structure
                 if (!token || !role || !userId) {
                     setError('Invalid response from the server. Please try again later.');
-                    console.error('Invalid response structure:', data);
                     return;
                 }
 
-                // Clear existing session storage
                 sessionStorage.clear();
-
-                // Save individual details in session storage
                 sessionStorage.setItem('token', token);
                 sessionStorage.setItem('role', role);
                 sessionStorage.setItem('userId', userId);
@@ -49,14 +43,6 @@ const Login = () => {
                 sessionStorage.setItem('latitude', coordinates?.latitude || '');
                 sessionStorage.setItem('longitude', coordinates?.longitude || '');
 
-                console.log('User details saved individually:', {
-                    token,
-                    role,
-                    userId,
-                    username,
-                });
-
-                // Redirect based on the role
                 if (role === 'donor') {
                     window.location.href = '/donor';
                 } else if (role === 'client') {
@@ -69,47 +55,43 @@ const Login = () => {
             }
         } catch (err) {
             setError('An error occurred while logging in. Please try again later.');
-            console.error('Login error:', err);
         }
     };
 
-
     return (
-        <div>
-            <Navbar/>
-            <div className="login-container container">
-                <div className="login-card">
-                    <h2>Login to Aaharamitra</h2>
-                    {error && <div className="alert alert-danger">{error}</div>}
-                    <form onSubmit={handleLogin}>
-                        <div className="mb-3">
-                            <label className="form-label">Username</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Password</label>
-                            <input
-                                type="password"
-                                className="form-control"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="btn btn-primary btn-block">
-                            Login
-                        </button>
-                        <a href="/signup" className="login-link">
-                            Don't have an account? Sign up here
-                        </a>
-                    </form>
-                </div>
+        <div className="login-container" style={{ backgroundImage: `url(${backgroundImage})` }}>
+            <Navbar />
+            <div className="login-card">
+                <h2>Login to Aaharamitra</h2>
+                {error && <div className="alert alert-danger">{error}</div>}
+                <form onSubmit={handleLogin}>
+                    <div className="mb-3">
+                        <label className="form-label">Username</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Password</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-block">
+                        Login
+                    </button>
+                    <a href="/signup" className="login-link">
+                        Don't have an account? Sign up here
+                    </a>
+                </form>
             </div>
         </div>
     );
