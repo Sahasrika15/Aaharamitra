@@ -65,8 +65,7 @@ const MainPageClient = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                const filteredDonations = filterDonationsWithin10km(data);
-                setAvailableDonations(filteredDonations);
+                setAvailableDonations(data);
             } else {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to fetch available donations.');
@@ -95,29 +94,6 @@ const MainPageClient = () => {
         }
     };
 
-    const filterDonationsWithin10km = (donations) => {
-        return donations.filter((donation) => {
-            if (!donation.coordinates) return false;
-            const { latitude, longitude } = donation.coordinates;
-            return isWithin10km(user.latitude, user.longitude, latitude, longitude);
-        });
-    };
-
-    const isWithin10km = (lat1, lon1, lat2, lon2) => {
-        const toRadians = (deg) => deg * (Math.PI / 180);
-        const R = 6371; // Radius of Earth in km
-
-        const dLat = toRadians(lat2 - lat1);
-        const dLon = toRadians(lon2 - lon1);
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        const distance = R * c; // Distance in km
-        return distance <= 10;
-    };
-
     const handleClaimDonation = async (donationId) => {
         setError('');
         setSuccessMessage('');
@@ -142,6 +118,10 @@ const MainPageClient = () => {
         }
     };
 
+    const getGoogleMapsLink = (latitude, longitude) => {
+        return `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    };
+
     return (
         <div>
             <Navbar />
@@ -161,7 +141,7 @@ const MainPageClient = () => {
                         <tr>
                             <th>#</th>
                             <th>Food Item</th>
-                            <th>Donor</th>
+                            <th>Organization</th>
                             <th>Description</th>
                             <th>Quantity</th>
                             <th>Veg/Non-Veg</th>
@@ -180,32 +160,52 @@ const MainPageClient = () => {
                             </tr>
                         ) : (
                             availableDonations.map((donation, index) => (
-                                <tr key={donation._id}>
-                                    <td>{index + 1}</td>
-                                    <td>{donation.foodItem}</td>
-                                    <td>{donation.donor.username}</td>
-                                    <td>{donation.description || 'N/A'}</td>
-                                    <td>{donation.quantity}</td>
-                                    <td>{donation.vegStatus}</td>
-                                    <td>{donation.packed ? 'Yes' : 'No'}</td>
-                                    <td>{donation.shelfLife}</td>
-                                    <td>
-                                            <span className={`status ${donation.status.toLowerCase()}`}>
-                                                {donation.status}
-                                            </span>
-                                    </td>
-                                    <td>
-                                        {donation.status === 'Available' && (
-                                            <Button
-                                                variant="primary"
-                                                size="sm"
-                                                onClick={() => handleClaimDonation(donation._id)}
-                                            >
-                                                Claim
-                                            </Button>
-                                        )}
-                                    </td>
-                                </tr>
+                                <>
+                                    <tr key={donation._id}>
+                                        <td>{index + 1}</td>
+                                        <td>{donation.foodItem}</td>
+                                        <td>{donation.donor.organizationName || 'N/A'}</td>
+                                        <td>{donation.description || 'N/A'}</td>
+                                        <td>{donation.quantity}</td>
+                                        <td>{donation.vegStatus}</td>
+                                        <td>{donation.packed ? 'Yes' : 'No'}</td>
+                                        <td>{donation.shelfLife}</td>
+                                        <td>
+                                                <span className={`status ${donation.status.toLowerCase()}`}>
+                                                    {donation.status}
+                                                </span>
+                                        </td>
+                                        <td>
+                                            {donation.coordinates && (
+                                                <a
+                                                    href={getGoogleMapsLink(
+                                                        donation.coordinates.latitude,
+                                                        donation.coordinates.longitude
+                                                    )}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="btn btn-sm btn-outline-info"
+                                                >
+                                                    View Location
+                                                </a>
+                                            )}
+                                            {donation.status === 'Available' && (
+                                                <Button
+                                                    variant="primary"
+                                                    size="sm"
+                                                    onClick={() => handleClaimDonation(donation._id)}
+                                                >
+                                                    Claim
+                                                </Button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colSpan="10" className="text-muted">
+                                            Address: {donation.location || 'N/A'}
+                                        </td>
+                                    </tr>
+                                </>
                             ))
                         )}
                         </tbody>
@@ -219,13 +219,13 @@ const MainPageClient = () => {
                         <tr>
                             <th>#</th>
                             <th>Food Item</th>
-                            <th>Donor</th>
+                            <th>Organization</th>
                             <th>Description</th>
                             <th>Quantity</th>
                             <th>Veg/Non-Veg</th>
                             <th>Packed</th>
                             <th>Shelf Life (hrs)</th>
-                            <th>Status</th>
+                            <th>Google Maps</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -237,21 +237,36 @@ const MainPageClient = () => {
                             </tr>
                         ) : (
                             claimedDonations.map((donation, index) => (
-                                <tr key={donation._id}>
-                                    <td>{index + 1}</td>
-                                    <td>{donation.foodItem}</td>
-                                    <td>{donation.donor.username}</td>
-                                    <td>{donation.description || 'N/A'}</td>
-                                    <td>{donation.quantity}</td>
-                                    <td>{donation.vegStatus}</td>
-                                    <td>{donation.packed ? 'Yes' : 'No'}</td>
-                                    <td>{donation.shelfLife}</td>
-                                    <td>
-                                            <span className={`status ${donation.status.toLowerCase()}`}>
-                                                {donation.status}
-                                            </span>
-                                    </td>
-                                </tr>
+                                <>
+                                    <tr key={donation._id}>
+                                        <td>{index + 1}</td>
+                                        <td>{donation.foodItem}</td>
+                                        <td>{donation.donor.organizationName || 'N/A'}</td>
+                                        <td>{donation.description || 'N/A'}</td>
+                                        <td>{donation.quantity}</td>
+                                        <td>{donation.vegStatus}</td>
+                                        <td>{donation.packed ? 'Yes' : 'No'}</td>
+                                        <td>{donation.shelfLife}</td>
+                                        <td>
+                                            <a
+                                                href={getGoogleMapsLink(
+                                                    donation.coordinates.latitude,
+                                                    donation.coordinates.longitude
+                                                )}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="btn btn-sm btn-outline-info"
+                                            >
+                                                View Location
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colSpan="9" className="text-muted">
+                                            Address: {donation.location || 'N/A'}
+                                        </td>
+                                    </tr>
+                                </>
                             ))
                         )}
                         </tbody>
