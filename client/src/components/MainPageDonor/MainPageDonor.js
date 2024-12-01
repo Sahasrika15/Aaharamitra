@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import React, {useState, useEffect} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {io} from 'socket.io-client';
 import Navbar from '../Navbar/Navbar';
 import './MainPageDonor.css';
-import { Modal, Button, Form, Card, Col, Row, Alert } from 'react-bootstrap';
+import {Modal, Button, Form, Card, Col, Row, Alert} from 'react-bootstrap';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'http://192.168.230.19:5000';
 const socket = io(BASE_URL);
 
 const MainPageDonor = () => {
@@ -148,7 +148,7 @@ const MainPageDonor = () => {
 
     return (
         <div>
-            <Navbar />
+            <Navbar/>
             <div className="mainpage-donor-container container">
                 <h2 className="text-center mt-4 mb-3">Welcome, {user.username}!</h2>
                 <p className="text-center text-muted mb-4">
@@ -176,7 +176,7 @@ const MainPageDonor = () => {
                                     type="text"
                                     name="foodItem"
                                     value={newDonation.foodItem}
-                                    onChange={(e) => setNewDonation({ ...newDonation, foodItem: e.target.value })}
+                                    onChange={(e) => setNewDonation({...newDonation, foodItem: e.target.value})}
                                     required
                                 />
                             </Form.Group>
@@ -186,16 +186,16 @@ const MainPageDonor = () => {
                                     as="textarea"
                                     name="description"
                                     value={newDonation.description}
-                                    onChange={(e) => setNewDonation({ ...newDonation, description: e.target.value })}
+                                    onChange={(e) => setNewDonation({...newDonation, description: e.target.value})}
                                 />
                             </Form.Group>
                             <Form.Group className="mb-3">
-                                <Form.Label>Quantity</Form.Label>
+                                <Form.Label>Servings</Form.Label>
                                 <Form.Control
                                     type="number"
                                     name="quantity"
                                     value={newDonation.quantity}
-                                    onChange={(e) => setNewDonation({ ...newDonation, quantity: e.target.value })}
+                                    onChange={(e) => setNewDonation({...newDonation, quantity: e.target.value})}
                                     required
                                 />
                             </Form.Group>
@@ -205,7 +205,7 @@ const MainPageDonor = () => {
                                     type="number"
                                     name="shelfLife"
                                     value={newDonation.shelfLife}
-                                    onChange={(e) => setNewDonation({ ...newDonation, shelfLife: e.target.value })}
+                                    onChange={(e) => setNewDonation({...newDonation, shelfLife: e.target.value})}
                                     required
                                 />
                             </Form.Group>
@@ -215,14 +215,14 @@ const MainPageDonor = () => {
                                     <Button
                                         className="btn-donation-option"
                                         variant={newDonation.vegStatus === 'Veg' ? 'success' : 'outline-success'}
-                                        onClick={() => setNewDonation({ ...newDonation, vegStatus: 'Veg' })}
+                                        onClick={() => setNewDonation({...newDonation, vegStatus: 'Veg'})}
                                     >
                                         Veg
                                     </Button>
                                     <Button
                                         className="btn-donation-option"
                                         variant={newDonation.vegStatus === 'Non-Veg' ? 'danger' : 'outline-danger'}
-                                        onClick={() => setNewDonation({ ...newDonation, vegStatus: 'Non-Veg' })}
+                                        onClick={() => setNewDonation({...newDonation, vegStatus: 'Non-Veg'})}
                                     >
                                         Non-Veg
                                     </Button>
@@ -234,14 +234,14 @@ const MainPageDonor = () => {
                                     <Button
                                         className="btn-donation-option"
                                         variant={newDonation.packed ? 'primary' : 'outline-primary'}
-                                        onClick={() => setNewDonation({ ...newDonation, packed: true })}
+                                        onClick={() => setNewDonation({...newDonation, packed: true})}
                                     >
                                         Packaged
                                     </Button>
                                     <Button
                                         className="btn-donation-option"
                                         variant={!newDonation.packed ? 'secondary' : 'outline-secondary'}
-                                        onClick={() => setNewDonation({ ...newDonation, packed: false })}
+                                        onClick={() => setNewDonation({...newDonation, packed: false})}
                                     >
                                         Unpackaged
                                     </Button>
@@ -263,15 +263,19 @@ const MainPageDonor = () => {
                             donations.map((donation) => (
                                 <Col key={donation._id}>
                                     <Card className="h-100 shadow card-donation">
-                                        <Card.Body onClick={() => handleDonationClick(donation)} style={{ cursor: 'pointer' }}>
+                                        <Card.Body onClick={() => handleDonationClick(donation)}
+                                                   style={{cursor: 'pointer'}}>
                                             <Card.Title>{donation.foodItem}</Card.Title>
                                             <Card.Text>{donation.description}</Card.Text>
                                             <ul className="list-unstyled">
-                                                <li><strong>Servings:</strong> {donation.quantity}</li> {/* Displaying as servings */}
+                                                <li><strong>Servings:</strong> {donation.quantity}</li>
+                                                {/* Displaying as servings */}
                                                 <li><strong>Shelf Life:</strong> {donation.shelfLife} hours</li>
                                                 <li><strong>Status:</strong> {donation.status}</li>
                                                 {donation.status === 'Claimed' && (
-                                                    <li><strong>Claimed By:</strong> {donation.claimedBy?.organizationName || 'N/A'}</li>
+                                                    <li><strong>Claimed
+                                                        By:</strong> {donation.claimedBy?.organizationName || 'N/A'}
+                                                    </li>
                                                 )}
                                             </ul>
                                             <Button
@@ -303,7 +307,8 @@ const MainPageDonor = () => {
                             <p><strong>Shelf Life:</strong> {selectedDonation.shelfLife} hours</p>
                             <p><strong>Status:</strong> {selectedDonation.status}</p>
                             {selectedDonation.status === 'Claimed' && (
-                                <p><strong>Claimed By:</strong> {selectedDonation.claimedBy?.organizationName || 'N/A'}</p>
+                                <p><strong>Claimed By:</strong> {selectedDonation.claimedBy?.organizationName || 'N/A'}
+                                </p>
                             )}
                         </Modal.Body>
                     </Modal>
