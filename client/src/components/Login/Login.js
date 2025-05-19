@@ -3,7 +3,7 @@ import Navbar from '../Navbar/Navbar';
 import './Login.css';
 import backgroundImage from './pic.jpg'; // Import background image
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://aaharamitra.onrender.com';
 
 const Login = () => {
     const [username, setUsername] = useState('');

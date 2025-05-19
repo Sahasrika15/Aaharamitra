@@ -5,7 +5,7 @@ import Navbar from '../Navbar/Navbar';
 import './MainPageDonor.css';
 import {Modal, Button, Form, Card, Col, Row, Alert} from 'react-bootstrap';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://aaharamitra.onrender.com';
 const socket = io(BASE_URL);
 
 const MainPageDonor = () => {

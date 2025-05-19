@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import Navbar from '../Navbar/Navbar';
 import './Signup.css';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://aaharamitra.onrender.com';
 const GOOGLE_MAPS_API_KEY = 'AIzaSyCd9-aeTjeDQ_g1Z9JT9F_-s73YO0jLLSE';
 
 const Signup = () => {

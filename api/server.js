@@ -12,7 +12,7 @@ const server = http.createServer(app);
 // Socket.IO setup
 const io = new Server(server, {
     cors: {
-        origin: '*', // Allow requests from any origin
+        origin: 'https://aaharamitra.vercel.app/', // Allow requests from any origin
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     },
