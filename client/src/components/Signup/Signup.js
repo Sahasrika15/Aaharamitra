@@ -2,8 +2,8 @@ import React, {useState, useEffect} from 'react';
 import Navbar from '../Navbar/Navbar';
 import './Signup.css';
 
-const BASE_URL = 'http://192.168.230.19:5000';
-const GOOGLE_MAPS_API_KEY = 'AIzaSyCO2csyZIgTNfjonjIg3utAnqJeN7CKnWs';
+const BASE_URL = 'http://localhost:5000';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyCd9-aeTjeDQ_g1Z9JT9F_-s73YO0jLLSE';
 
 const Signup = () => {
     const [formData, setFormData] = useState({
